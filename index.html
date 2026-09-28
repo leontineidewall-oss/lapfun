@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lap.fun</title>
+<meta name="description" content="One coin per Trackmania Track of the Day. When the next track drops, the fastest lap takes the day's fees, in SOL.">
+<meta property="og:title" content="lap.fun">
+<meta property="og:description" content="Set the fastest lap. Take today's fees. One coin per Track of the Day, a new winner every day.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lapfun.vercel.app/">
+<meta property="og:image" content="https://lapfun.vercel.app/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="lap.fun">
+<meta name="twitter:description" content="Set the fastest lap. Take today's fees.">
+<meta name="twitter:image" content="https://lapfun.vercel.app/og.jpg">
+<meta name="theme-color" content="#0b0c0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2224%22%20fill%3D%22%2318c8ff%22/%3E%3Cpath%20d%3D%22M58%2014%20L46%2070%20C44%2082%2049%2087%2057%2087%20H72%22%20fill%3D%22none%22%20stroke%3D%22%230b0b0c%22%20stroke-width%3D%2214%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c0f;--bg2:#101217;--card:#15171c;--card2:#1b1e24;--line:#262a32;--line2:#30353f;
+  --ink:#f4f6f8;--ink2:#c9ced6;--mute:#9aa1ab;--mute2:#6f7681;
+  --acc:#18c8ff;--acc2:#0a9ad4;--accbg:rgba(24,200,255,.10);
+  --r:22px;--sans:"Inter","Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,"DejaVu Sans Mono",Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden;scroll-behavior:smooth;-webkit-text-size-adjust:100%;background:var(--bg)}
+body{overflow-x:clip;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px}
+section{scroll-margin-top:84px}
+.mono{font-family:var(--mono)}
+.num{font-variant-numeric:tabular-nums}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(11,12,15,.78);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid transparent;transition:border-color .2s}
+.nav.sc{border-bottom-color:var(--line)}
+.nav .wrap{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em;text-decoration:none;justify-self:start}
+.logo .pm{width:32px;height:32px;border-radius:9px;background:var(--acc);display:grid;place-items:center;flex:none}
+.logo .pm svg{width:26px;height:26px}
+.links{display:flex;gap:4px}
+.links a{font-size:15px;font-weight:500;color:var(--ink2);text-decoration:none;padding:8px 12px;border-radius:999px;transition:background .15s}
+.links a:hover{background:rgba(255,255,255,.07)}
+.navr{justify-self:end}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px rgba(24,200,255,.22)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 24px;border-radius:999px;font-weight:700;font-size:16px;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--acc);color:#061018}
+.btn.pri:hover{background:#4fd6ff}
+.btn.alt{background:transparent;border-color:var(--line2);color:var(--ink)}
+.btn.alt:hover{border-color:#4a515e}
+
+/* hero */
+.hero{position:relative;padding-top:56px;padding-bottom:28px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(ellipse 60% 75% at 70% 40%,#000 0%,rgba(0,0,0,.4) 55%,transparent 100%);mask-image:radial-gradient(ellipse 60% 75% at 70% 40%,#000 0%,rgba(0,0,0,.4) 55%,transparent 100%)}
+.hero:after{content:"";position:absolute;right:-120px;top:-80px;width:760px;height:760px;background:radial-gradient(closest-side,rgba(24,200,255,.16),transparent);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:40px;align-items:center}
+.hero .wrap.strip{display:block}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--mute);margin-bottom:22px}
+.eyebrow .ck{width:22px;height:14px;display:grid;grid-template-columns:repeat(4,1fr);border-radius:3px;overflow:hidden}
+.eyebrow .ck span{background:#fff}.eyebrow .ck span:nth-child(odd){background:#0b0b0c}
+.eyebrow .ck span:nth-child(n+5):nth-child(even){background:#0b0b0c}.eyebrow .ck span:nth-child(n+5):nth-child(odd){background:#fff}
+h1{font-size:clamp(42px,5.6vw,68px);line-height:.98;letter-spacing:-.055em;font-weight:900}
+h1 em{font-style:normal;color:var(--acc)}
+.lead{margin-top:24px;font-size:clamp(18px,1.6vw,21px);line-height:1.5;color:var(--mute);max-width:540px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+
+/* live card */
+.live{position:relative;background:var(--card);border:1px solid var(--line);border-radius:26px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.5)}
+.thumb{position:relative;height:190px;background:#12151b;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s}
+.thumb img.ok{opacity:1}
+.thumb:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,23,28,0) 35%,rgba(21,23,28,.96) 100%)}
+.badge{position:absolute;left:16px;top:16px;z-index:1;display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(11,12,15,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 11px}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 3px rgba(24,200,255,.25)}
+.lbody{position:relative;padding:0 22px 20px;margin-top:-54px;z-index:1}
+.tname{font-size:26px;font-weight:900;letter-spacing:-.03em;line-height:1.15;word-break:break-word}
+.tmeta{margin-top:4px;font-size:14px;color:var(--mute)}
+.tmeta b{color:var(--ink2);font-weight:600}
+.clock{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;font-size:13.5px;color:var(--mute)}
+.clock b{font-family:var(--mono);font-size:22px;color:var(--ink);font-weight:700;letter-spacing:-.01em}
+.bar{height:6px;border-radius:3px;background:#262a32;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .6s}
+.tops{margin-top:14px;display:grid;gap:2px}
+.tr{display:grid;grid-template-columns:24px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;font-size:15px}
+.tr.first{background:var(--accbg)}
+.tr .p{color:var(--mute2);font-weight:800}
+.tr.first .p{color:var(--acc)}
+.tr .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tr .g{font-family:var(--mono);font-size:12.5px;color:var(--mute2)}
+.tr .t{font-family:var(--mono);font-weight:700;text-align:right;min-width:74px}
+.tr.first .t{color:var(--acc)}
+.potline{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:14px;color:var(--mute)}
+.potline b{font-size:24px;font-weight:900;color:var(--ink);letter-spacing:-.03em}
+.state{color:var(--mute2)}
+.state.err{color:#ff7b72}
+
+/* day strip */
+.strip{margin-top:44px}
+.lane{position:relative;height:74px;border-radius:18px;background:var(--bg2);border:1px solid var(--line);overflow:hidden}
+.lane:before{content:"";position:absolute;left:24px;right:24px;top:50%;height:2px;background:repeating-linear-gradient(90deg,#3a404b 0 12px,transparent 12px 22px)}
+.lane .fin{position:absolute;right:18px;top:14px;bottom:14px;width:18px;background-image:linear-gradient(45deg,#fff 25%,transparent 25%,transparent 75%,#fff 75%),linear-gradient(45deg,#fff 25%,#0b0b0c 25%,#0b0b0c 75%,#fff 75%);background-size:9px 9px;background-position:0 0,4.5px 4.5px;border-radius:3px}
+.lane .start{position:absolute;left:18px;top:14px;bottom:14px;width:4px;background:var(--acc);border-radius:2px}
+.car{position:absolute;top:50%;left:24px;width:34px;height:16px;margin-top:-8px;border-radius:5px;background:var(--acc);box-shadow:0 0 18px rgba(24,200,255,.7);transition:left 1s linear}
+.car:before{content:"";position:absolute;right:-60px;top:6px;width:0;height:0}
+.car:after{content:"";position:absolute;right:100%;top:5px;width:90px;height:6px;border-radius:3px;background:linear-gradient(90deg,transparent,rgba(24,200,255,.55))}
+.legs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.leg{font-size:15px;color:var(--mute)}
+.leg b{display:block;color:var(--ink);font-size:16px;margin-bottom:2px}
+.leg:nth-child(2){text-align:center}.leg:nth-child(3){text-align:right}
+
+/* sections */
+.sec{padding-top:110px}
+.kick{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--acc)}
+h2{font-size:clamp(34px,4.6vw,56px);line-height:1.02;letter-spacing:-.045em;font-weight:900;margin-top:12px;max-width:840px}
+.sub{margin-top:16px;font-size:18.5px;color:var(--mute);max-width:660px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.card h3{font-size:22px;letter-spacing:-.03em;line-height:1.2}
+.hint{font-size:15px;color:var(--mute);margin-top:6px}
+
+/* board */
+.board{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);gap:18px;margin-top:40px;align-items:start}
+table.lb{width:100%;border-collapse:collapse;font-size:15.5px;margin-top:14px}
+.lb th{text-align:left;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute2);font-weight:700;padding:0 8px 10px}
+.lb td{padding:11px 8px;border-top:1px solid var(--line)}
+.lb td.p{color:var(--mute2);font-weight:800;width:38px}
+.lb tr.first td{background:var(--accbg)}
+.lb tr.first td.p,.lb tr.first td.t{color:var(--acc)}
+.lb td.t{font-family:var(--mono);font-weight:700;text-align:right;white-space:nowrap}
+.lb td.g{font-family:var(--mono);font-size:13px;color:var(--mute2);text-align:right;white-space:nowrap}
+.lb td.z{color:var(--mute);font-size:14px}
+.lb td.a{color:var(--mute2);font-size:13px;white-space:nowrap}
+.lb .nm{font-weight:600;word-break:break-all}
+.lbmeta{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font-size:14px;color:var(--mute)}
+.lbmeta b{color:var(--ink);font-weight:600}
+.form{display:grid;gap:12px;margin-top:18px}
+label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin-bottom:6px}
+.inp{width:100%;height:52px;border:1px solid var(--line2);border-radius:14px;background:var(--bg2);padding:0 14px;font-size:18px;outline:none;font-family:var(--mono)}
+.inp:focus{border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line2);background:transparent;border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink2);font-family:var(--mono)}
+.chip:hover{border-color:#4a515e}
+.out{margin-top:16px;border-radius:16px;background:var(--bg2);border:1px solid var(--line);padding:18px;min-height:92px;font-size:15.5px;color:var(--mute)}
+.out .big{font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--ink);line-height:1.2}
+.out.win{background:var(--accbg);border-color:rgba(24,200,255,.4)}
+.out.win .big{color:var(--acc)}
+.out p{margin-top:6px}
+
+/* recent */
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;margin-top:40px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.day .im{height:120px;background:#12151b;position:relative}
+.day .im img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s}
+.day .im img.ok{opacity:1}
+.day .dt{position:absolute;left:10px;top:10px;font-size:12px;font-weight:700;background:rgba(11,12,15,.75);border-radius:8px;padding:4px 8px}
+.day .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.day .nm{font-weight:800;font-size:16.5px;letter-spacing:-.01em;line-height:1.25;word-break:break-word}
+.day .au{font-size:13.5px;color:var(--mute)}
+.day .win{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--mute)}
+.day .win b{color:var(--ink);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day .win .t{font-family:var(--mono);color:var(--acc);font-weight:700;white-space:nowrap}
+
+/* math */
+.math{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:40px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.res{background:linear-gradient(160deg,#10222c,#0f1318 60%);border:1px solid #1e3a47;border-radius:var(--r);padding:26px;display:flex;flex-direction:column}
+.res .l{font-size:13px;color:var(--mute);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.res .v{font-size:clamp(44px,6vw,66px);font-weight:900;letter-spacing:-.05em;line-height:1;margin-top:10px}
+.res .v small{font-size:20px;color:var(--mute);letter-spacing:0;margin-left:6px;font-weight:600}
+.res .br{margin-top:auto;padding-top:22px;display:grid;gap:8px;font-size:14.5px}
+.res .br div{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:8px;color:var(--mute)}
+.res .br b{color:var(--ink);font-weight:600}
+
+/* rules */
+.rules{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:40px}
+.tbl{width:100%;border-collapse:collapse;font-size:15.5px}
+.tbl th,.tbl td{text-align:left;padding:13px 0;border-top:1px solid var(--line);vertical-align:top}
+.tbl th{font-weight:600;color:var(--mute);width:40%;padding-right:14px}
+.tbl tr:first-child th,.tbl tr:first-child td{border-top:0}
+.tbl td b{color:var(--acc);font-weight:700}
+.cn div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;padding:13px 0;border-top:1px solid var(--line);font-size:15px}
+.cn div:first-child{border-top:0;padding-top:4px;font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--mute2)}
+.cn span:first-child{color:var(--ink2);font-weight:600}
+.cn span:last-child{color:var(--mute)}
+
+/* faq */
+.faq{margin-top:36px;max-width:860px}
+details{border-top:1px solid var(--line)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 0;font-size:19px;font-weight:700;letter-spacing:-.02em}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"+";font-size:26px;font-weight:400;color:var(--mute2);transition:transform .2s;flex:none}
+details[open] summary:after{transform:rotate(45deg)}
+details p{padding-bottom:22px;color:var(--mute);max-width:720px}
+
+/* close + footer */
+.close{margin-top:120px;border-radius:32px;padding:64px 48px;position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;background:var(--acc);color:#061018}
+.close:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-72deg,rgba(255,255,255,.10) 0 26px,transparent 26px 70px)}
+.close h2{margin-top:0;position:relative;color:#061018}
+.close p{position:relative;margin-top:10px;font-size:18px;color:#0a3a4f}
+.close .btn{position:relative;background:#061018;color:#fff}
+.close .btn:hover{background:#15202a}
+footer{padding-top:56px;padding-bottom:48px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:18px}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--mute)}
+.flinks a{text-decoration:none}
+.flinks a:hover{color:var(--ink)}
+.flinks .off{color:var(--mute2)}
+
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.rv.vis{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .links{display:none}
+  .nav .wrap{grid-template-columns:1fr auto}
+  .hero .wrap,.board,.math,.rules{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:600px){
+  body{font-size:16px}
+  .wrap{padding-left:16px;padding-right:16px}
+  .hero{padding-top:28px}
+  .sec{padding-top:80px}
+  .card,.res{padding:20px}
+  .row2{grid-template-columns:minmax(0,1fr)}
+  .thumb{height:150px}
+  .tname{font-size:22px}
+  .tr{grid-template-columns:22px minmax(0,1fr) auto;font-size:14.5px}
+  .tr .g{display:none}
+  .lb td.z,.lb th.z,.lb td.a,.lb th.a{display:none}
+  .legs{grid-template-columns:minmax(0,1fr)}
+  .leg:nth-child(2),.leg:nth-child(3){text-align:left}
+  .close{grid-template-columns:minmax(0,1fr);padding:40px 22px;border-radius:24px}
+  .pill .y{display:none}
+  .cn div{gap:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .car{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="lap.fun home"><span class="pm"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M58 14 L46 70 C44 82 49 87 57 87 H72" fill="none" stroke="#0b0b0c" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg></span>lap.fun</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#today">Today</a>
+      <a href="#board">Leaderboard</a>
+      <a href="#days">Past days</a>
+      <a href="#math">Fee math</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="navr"><span class="pill" title="No coins or pots are live yet"><i></i><span>Not live<span class="y"> yet</span></span></span></div>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="today">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><span class="ck" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>For Trackmania players, on Solana</div>
+      <h1>Set the fastest lap.<br>Take today's <em>fees.</em></h1>
+      <p class="lead">Every Track of the Day gets a coin. When the next track drops, whoever holds the fastest time takes that coin's fees, in SOL. Then a new track, and a new winner.</p>
+      <div class="cta">
+        <a class="btn pri" href="#board">See today's times</a>
+        <a class="btn alt" href="#check">Would your time win?</a>
+      </div>
+    </div>
+    <article class="live" aria-live="polite">
+      <div class="thumb"><img id="tImg" alt=""><span class="badge"><i></i>Track of the Day</span></div>
+      <div class="lbody">
+        <div class="tname" id="tName"><span class="state">Reading today's track…</span></div>
+        <div class="tmeta" id="tMeta">&nbsp;</div>
+        <div class="clock"><span>next track drops in</span><b id="tClock">—</b></div>
+        <div class="bar"><i id="tBar"></i></div>
+        <div class="tops" id="tTops"></div>
+        <div class="potline"><span>when it drops, #1 takes</span><b title="No coin has launched yet">—</b></div>
+      </div>
+    </article>
+  </div>
+  <div class="wrap strip rv">
+    <div class="lane" aria-hidden="true"><span class="start"></span><span class="car" id="car"></span><span class="fin"></span></div>
+    <div class="legs">
+      <div class="leg"><b>19:00 Paris · track drops</b>Its coin launches with it.</div>
+      <div class="leg"><b>24 hours of racing</b>Fees build up while times fall.</div>
+      <div class="leg"><b>Next drop · #1 takes it</b>The fastest time gets the fees.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="board">
+  <div class="wrap">
+    <div class="kick rv">Live leaderboard</div>
+    <h2 class="rv">Today's top 10, straight from the game.</h2>
+    <p class="sub rv">Times refresh every minute. The #1 when the next track drops is the one who gets paid.</p>
+    <div class="board">
+      <div class="card rv">
+        <div class="lbmeta"><span id="lbTrack">—</span><span><b id="lbPlayers">—</b> players · updated <b id="lbAt">—</b></span></div>
+        <table class="lb">
+          <thead><tr><th>#</th><th>Player</th><th class="z">Zone</th><th class="a">Set</th><th style="text-align:right">Gap</th><th style="text-align:right">Time</th></tr></thead>
+          <tbody id="lbBody"><tr><td colspan="6" class="state">Reading the leaderboard…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="card rv" id="check">
+        <h3>Would your time win?</h3>
+        <p class="hint">Type a time on today's track, like 41.2 or 0:41.250.</p>
+        <form class="form" id="chkForm" autocomplete="off" novalidate>
+          <div><label for="chkIn">Your time</label><input class="inp" id="chkIn" inputmode="decimal" placeholder="41.250"></div>
+          <button class="btn pri" type="submit">Check it</button>
+          <div class="chips" id="chkChips"></div>
+        </form>
+        <div class="out" id="chkOut" aria-live="polite">Your place shows here.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="days">
+  <div class="wrap">
+    <div class="kick rv">Past days</div>
+    <h2 class="rv">Every day has a winner.</h2>
+    <p class="sub rv">The last tracks, and who held the fastest time when the next one dropped. Pots show a dash until coins launch.</p>
+    <div class="days" id="dayGrid"></div>
+  </div>
+</section>
+
+<section class="sec" id="math">
+  <div class="wrap">
+    <div class="kick rv">Fee math</div>
+    <h2 class="rv">What is a day worth?</h2>
+    <p class="sub rv">A day's pot is its coin's trading volume times the creator fee. Change the numbers.</p>
+    <div class="math">
+      <div class="card rv">
+        <form class="form" id="mathForm" autocomplete="off" novalidate>
+          <div><label for="mVol">Volume on today's coin (SOL)</label><input class="inp" id="mVol" inputmode="decimal" value="100"></div>
+          <div class="row2">
+            <div><label for="mFee">Creator fee (%)</label><input class="inp" id="mFee" inputmode="decimal" value="0.3"></div>
+            <div><label for="mDays">Days of tracks</label><input class="inp" id="mDays" inputmode="numeric" value="365"></div>
+          </div>
+          <p class="hint">lap.fun keeps 1% of fees. The other 99% goes to the day's #1. Fees can be zero if nobody trades.</p>
+        </form>
+      </div>
+      <div class="res rv" aria-live="polite">
+        <div class="l">Today's #1 takes</div>
+        <div class="v num"><span id="mOut">—</span><small>SOL</small></div>
+        <div class="br">
+          <div><span>Fees on the day</span><b class="num" id="mDay">—</b></div>
+          <div><span>Paid to winners over those days</span><b class="num" id="mYear">—</b></div>
+          <div><span>To lap.fun over those days (1%)</span><b class="num" id="mCut">—</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="rules">
+  <div class="wrap">
+    <div class="kick rv">Rules</div>
+    <h2 class="rv">Planned rules, as numbers.</h2>
+    <div class="rules">
+      <div class="card rv">
+        <table class="tbl">
+          <tr><th>Coins</th><td><b>1</b> per Track of the Day, launched when it drops</td></tr>
+          <tr><th>A day</th><td>From one drop to the next, <b>24 hours</b>, 19:00 Paris time</td></tr>
+          <tr><th>Who wins</th><td>The fastest time set <b>before</b> the next drop, per the official leaderboard</td></tr>
+          <tr><th>Ties</th><td>The time set <b>first</b> wins, same as the game</td></tr>
+          <tr><th>Where fees go</th><td><b>99%</b> to the day's #1, <b>1%</b> to lap.fun</td></tr>
+          <tr><th>After the day</th><td>The coin keeps trading. Its fees keep going to <b>that day's winner</b></td></tr>
+          <tr><th>How they claim</th><td>Sign in with their <b>Trackmania account</b>, add a Solana wallet</td></tr>
+          <tr><th>If they never claim</th><td>It <b>waits</b> for them. Never swept back</td></tr>
+        </table>
+      </div>
+      <div class="card rv">
+        <div class="cn">
+          <div><span>It cannot</span><span>So it</span></div>
+          <div><span>Watch the game itself</span><span>Reads the public leaderboard every minute, and uses the time each record was set</span></div>
+          <div><span>Stop a record after the drop counting on the board</span><span>Only counts times set before the drop</span></div>
+          <div><span>Make anyone trade</span><span>Shows every day as it is. A small pot is still a pot, and zero is possible</span></div>
+          <div><span>Hold pots without keys</span><span>Keys sit on a server. Every pot address and payout will be public</span></div>
+          <div><span>Read the game's API forever</span><span>Uses a public mirror today, and will say so on the page if it stops answering</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="kick rv">FAQ</div>
+    <h2 class="rv">Questions.</h2>
+    <div class="faq rv">
+      <details><summary>Is anything live yet?</summary><p>No. The tracks and times on this page are real and read live, but no coins have launched, so every pot shows a dash. The rules above are the plan.</p></details>
+      <details><summary>Where do the tracks and times come from?</summary><p>From the official Track of the Day and its leaderboard, read through trackmania.io, a public mirror of the game's data. The page asks for fresh times every minute.</p></details>
+      <details><summary>How is the winner of a past day picked?</summary><p>From that track's current top 10, the best time with a timestamp before the next drop. If a player improved their time after the drop, their earlier time is no longer on the board, so a finished day can show a dash here until payouts are recorded at the drop itself.</p></details>
+      <details><summary>Do I need crypto to win?</summary><p>You need a Solana wallet to receive the fees. Signing in uses your normal Trackmania account, so nobody can claim a day that belongs to someone else.</p></details>
+      <details><summary>Why one day, and not all time?</summary><p>Because a new track every day means a new winner every day. Anyone can take a day, not just the few players at the very top of the world rankings.</p></details>
+      <details><summary>Is lap.fun part of Trackmania?</summary><p>No. lap.fun is independent and uses public leaderboard data. A coin for a track is not an endorsement by the game, the track's author or any player.</p></details>
+    </div>
+    <div class="close rv">
+      <div>
+        <h2>A new track drops every day.</h2>
+        <p>Follow along for launch.</p>
+      </div>
+      <a class="btn" id="followBtn" href="#board">See today's times</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="#top"><span class="pm"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M58 14 L46 70 C44 82 49 87 57 87 H72" fill="none" stroke="#0b0b0c" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg></span>lap.fun</a>
+    <div class="flinks">
+      <a id="fX" class="off" href="#top" aria-disabled="true">X —</a>
+      <a id="fGh" href="#top" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://trackmania.io/#/totd" target="_blank" rel="noopener">Track of the Day</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var CONFIG = { x: "", github: "https://github.com/leontineidewall-oss/lapfun" };
+var API = "/api/";
+
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]; }); }
+
+/* Trackmania formatted names: $RGB colours, $z/$g reset, $$ literal, $l[..] links skipped */
+function lift(h){
+  var d = h.split("").map(function(c){ return parseInt(c, 16); });
+  if (d[0] + d[1] + d[2] < 18) d = d.map(function(v){ return Math.min(15, v + 6); });
+  return d.map(function(v){ return v.toString(16); }).join("");
+}
+function tmParse(s){
+  var parts = [], color = null, buf = "", i = 0;
+  s = String(s || "");
+  function flush(){ if (buf){ parts.push([buf, color]); buf = ""; } }
+  while (i < s.length){
+    var c = s.charAt(i);
+    if (c !== "$"){ buf += c; i++; continue; }
+    var n = s.charAt(i + 1);
+    if (!n){ i++; continue; }
+    if (n === "$"){ buf += "$"; i += 2; continue; }
+    if (/[0-9a-fA-F]/.test(n)){
+      var h = s.substr(i + 1, 3);
+      flush();
+      if (/^[0-9a-fA-F]{3}$/.test(h)){ color = h.toLowerCase(); i += 4; } else { i += 2; }
+      continue;
+    }
+    var l = n.toLowerCase();
+    if ((l === "l" || l === "h" || l === "p") && s.charAt(i + 2) === "["){ var e = s.indexOf("]", i + 3); i = e < 0 ? s.length : e + 1; continue; }
+    flush();
+    if (l === "z" || l === "g") color = null;
+    i += 2;
+  }
+  flush();
+  return parts;
+}
+function tmHTML(s){
+  var html = tmParse(s).map(function(p){ return p[1] ? '<span style="color:#' + lift(p[1]) + '">' + esc(p[0]) + "</span>" : esc(p[0]); }).join("");
+  return html.trim() ? html : esc("Untitled");
+}
+function tmText(s){ var t = tmParse(s).map(function(p){ return p[0]; }).join("").trim(); return t || "Untitled"; }
+
+function ft(ms){
+  if (ms == null || !(ms > 0)) return "—";
+  var m = Math.floor(ms / 60000), s = (ms % 60000) / 1000;
+  return m ? m + ":" + (s < 10 ? "0" : "") + s.toFixed(3) : s.toFixed(3);
+}
+function parseTime(str){
+  str = String(str || "").trim().replace(",", ".");
+  var m = str.match(/^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$/);
+  if (!m) return null;
+  var min = +(m[1] || 0), sec = +m[2];
+  if (m[1] && sec >= 60) return null;
+  var frac = m[3] ? +(m[3] + "00").slice(0, 3) : 0;
+  var v = min * 60000 + sec * 1000 + frac;
+  return v > 0 ? v : null;
+}
+function ago(iso){
+  var t = Date.parse(iso); if (isNaN(t)) return "—";
+  var s = Math.max(0, (Date.now() - t) / 1000);
+  if (s < 90) return "just now";
+  if (s < 5400) return Math.round(s / 60) + " min ago";
+  if (s < 172800) return Math.round(s / 3600) + " h ago";
+  return Math.round(s / 86400) + " d ago";
+}
+function hms(ms){
+  if (!(ms >= 0)) return "—";
+  var s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+  return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m + ":" + (x < 10 ? "0" : "") + x;
+}
+
+/* the drop: 19:00 Europe/Paris */
+function parisOffsetMin(utc){
+  var p = {};
+  new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", hour12: false, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    .formatToParts(new Date(utc)).forEach(function(x){ p[x.type] = x.value; });
+  var asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, (+p.hour) % 24, +p.minute, +p.second);
+  return Math.round((asUTC - utc) / 60000);
+}
+function dropUTC(date){
+  var y = +date.slice(0, 4), mo = +date.slice(5, 7), d = +date.slice(8, 10);
+  var naive = Date.UTC(y, mo - 1, d, 19, 0, 0);
+  var t = naive - parisOffsetMin(naive - 7200000) * 60000;
+  return naive - parisOffsetMin(t) * 60000;
+}
+function nextDate(date){
+  return new Date(Date.UTC(+date.slice(0, 4), +date.slice(5, 7) - 1, +date.slice(8, 10)) + 86400000).toISOString().slice(0, 10);
+}
+function fmtDay(date){
+  var M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return (+date.slice(8, 10)) + " " + M[+date.slice(5, 7) - 1];
+}
+
+/* fetch */
+function getJSON(path){
+  return new Promise(function(resolve, reject){
+    var ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var t = setTimeout(function(){ if (ctl) ctl.abort(); reject(new Error("timeout")); }, 15000);
+    fetch(API + path, ctl ? { signal: ctl.signal, cache: "no-store" } : { cache: "no-store" }).then(function(r){
+      clearTimeout(t);
+      if (!r.ok){ var e = new Error("HTTP " + r.status); e.code = r.status; reject(e); return; }
+      return r.json().then(resolve, reject);
+    }, function(err){ clearTimeout(t); reject(err); });
+  });
+}
+
+/* state */
+var today = null, todayTops = null, todayPlayers = null, tracks = [];
+
+function setImg(img, src){
+  if (!src){ return; }
+  img.onload = function(){ img.classList.add("ok"); };
+  img.onerror = function(){ img.removeAttribute("src"); };
+  img.src = src;
+}
+
+function renderToday(){
+  if (!today) return;
+  $("#tName").innerHTML = tmHTML(today.name);
+  $("#tMeta").innerHTML = "by <b>" + esc(today.author.name || "—") + "</b>" + (today.author.zone ? " · " + esc(today.author.zone) : "") + " · " + fmtDay(today.date) + (today.authorTime ? " · author time <b class=\"mono\">" + ft(today.authorTime) + "</b>" : "");
+  $("#tImg").alt = "Thumbnail of " + tmText(today.name);
+  if (!$("#tImg").getAttribute("src")) setImg($("#tImg"), today.thumb);
+  $("#lbTrack").innerHTML = tmHTML(today.name);
+}
+function renderTops(){
+  var box = $("#tTops"), body = $("#lbBody");
+  if (todayTops === "err"){
+    box.innerHTML = '<div class="state err" style="padding:8px 10px">The leaderboard didn\'t answer. Retrying every minute.</div>';
+    body.innerHTML = '<tr><td colspan="6" class="state err">The leaderboard didn\'t answer. Retrying every minute.</td></tr>';
+    return;
+  }
+  if (!todayTops) return;
+  if (!todayTops.length){
+    box.innerHTML = '<div class="state" style="padding:8px 10px">No times yet. The track just dropped.</div>';
+    body.innerHTML = '<tr><td colspan="6" class="state">No times yet. The track just dropped.</td></tr>';
+    return;
+  }
+  var best = todayTops[0].time;
+  box.innerHTML = todayTops.slice(0, 5).map(function(t, i){
+    return '<div class="tr' + (i ? "" : " first") + '"><span class="p">' + t.pos + '</span><span class="nm">' + esc(t.name) + '</span><span class="g">' + (i ? "+" + ((t.time - best) / 1000).toFixed(3) : "") + '</span><span class="t">' + ft(t.time) + "</span></div>";
+  }).join("");
+  body.innerHTML = todayTops.map(function(t, i){
+    return '<tr' + (i ? "" : ' class="first"') + '><td class="p">' + t.pos + '</td><td><span class="nm">' + esc(t.name) + '</span></td><td class="z">' + esc(t.zone || "—") + '</td><td class="a">' + ago(t.at) + '</td><td class="g">' + (i ? "+" + ((t.time - best) / 1000).toFixed(3) : "") + '</td><td class="t">' + ft(t.time) + "</td></tr>";
+  }).join("");
+  $("#lbPlayers").textContent = todayPlayers == null ? "—" : todayPlayers.toLocaleString("en-US");
+  $("#lbAt").textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  var chips = $("#chkChips");
+  if (!chips.children.length){
+    [best - 150, todayTops[Math.min(4, todayTops.length - 1)].time + 20, best + 2600].forEach(function(v){
+      if (!(v > 0)) return;
+      var b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = ft(v);
+      b.addEventListener("click", function(){ $("#chkIn").value = ft(v); check(); });
+      chips.appendChild(b);
+    });
+  }
+}
+function tick(){
+  if (!today) return;
+  var start = dropUTC(today.date), end = dropUTC(nextDate(today.date)), now = Date.now();
+  var left = end - now, frac = Math.min(1, Math.max(0, (now - start) / (end - start)));
+  $("#tClock").textContent = left > 0 ? hms(left) : "dropping now";
+  $("#tBar").style.width = (frac * 100).toFixed(2) + "%";
+  var lane = $(".lane"), car = $("#car");
+  if (lane && car){ var w = lane.clientWidth - 24 - 60; car.style.left = (24 + w * frac).toFixed(1) + "px"; }
+  if (left < -60000 && !tick.refetching){ tick.refetching = true; loadTracks(true); setTimeout(function(){ tick.refetching = false; }, 60000); }
+}
+function loadTops(){
+  if (!today) return Promise.resolve();
+  return getJSON("lb?uid=" + encodeURIComponent(today.mapUid)).then(function(j){
+    todayTops = j.tops || []; todayPlayers = j.players; renderTops();
+  }, function(){ if (!todayTops || todayTops === "err"){ todayTops = "err"; renderTops(); } });
+}
+function renderDays(){
+  var grid = $("#dayGrid"), past = tracks.slice(1, 8);
+  if (!past.length){ grid.innerHTML = '<div class="state">No past days to show.</div>'; return; }
+  grid.innerHTML = past.map(function(t, i){
+    return '<article class="day rv vis" id="d-' + i + '"><div class="im"><img alt="Thumbnail of ' + esc(tmText(t.name)) + '"><span class="dt">' + fmtDay(t.date) + '</span></div><div class="bd"><div class="nm">' + tmHTML(t.name) + '</div><div class="au">by ' + esc(t.author.name || "—") + '</div><div class="win"><span>#1 at the drop</span><span class="w"><span class="state">reading…</span></span></div><div class="win" style="border-top:0;padding-top:0;margin-top:0"><span>Pot</span><b title="No coin has launched yet">—</b></div></div></article>';
+  }).join("");
+  past.forEach(function(t, i){
+    setImg($("#d-" + i + " img"), t.thumb);
+    setTimeout(function(){
+      getJSON("lb?uid=" + encodeURIComponent(t.mapUid)).then(function(j){
+        var close = dropUTC(nextDate(t.date));
+        var w = (j.tops || []).filter(function(x){ var a = Date.parse(x.at); return !isNaN(a) && a < close; })[0];
+        $("#d-" + i + " .w").innerHTML = w ? "<b>" + esc(w.name) + '</b> <span class="t">' + ft(w.time) + "</span>" : '<span class="state">—</span>';
+      }, function(){ $("#d-" + i + " .w").innerHTML = '<span class="state err">didn\'t answer</span>'; });
+    }, 350 * i);
+  });
+}
+function loadTracks(quiet){
+  return getJSON("totd").then(function(j){
+    var list = (j && j.tracks) || [];
+    if (!list.length) throw new Error("empty");
+    var changed = !today || today.mapUid !== list[0].mapUid;
+    tracks = list; today = list[0];
+    if (changed){
+      $("#tImg").removeAttribute("src"); $("#tImg").classList.remove("ok");
+      todayTops = null; $("#chkChips").innerHTML = "";
+      renderToday(); renderDays(); loadTops();
+    }
+    tick();
+  }, function(){
+    if (quiet && today) return;
+    $("#tName").innerHTML = '<span class="state err">Track of the Day didn\'t answer.</span>';
+    $("#tMeta").textContent = "We won't guess. The page will try again in a minute.";
+    $("#tTops").innerHTML = ""; $("#lbBody").innerHTML = '<tr><td colspan="6" class="state err">Track of the Day didn\'t answer.</td></tr>';
+    $("#dayGrid").innerHTML = '<div class="state err">Track of the Day didn\'t answer.</div>';
+    setTimeout(function(){ loadTracks(false); }, 60000);
+  });
+}
+
+/* check a time */
+function setOut(el, html, win){ el.innerHTML = html; el.classList.toggle("win", !!win); }
+function check(){
+  var out = $("#chkOut"), mine = parseTime($("#chkIn").value);
+  if (mine == null){ setOut(out, '<div class="big">Not a time we can read.</div><p>Type seconds like 41.250, or minutes like 1:02.500.</p>'); return; }
+  if (!today || !todayTops || todayTops === "err"){ setOut(out, '<div class="big">No leaderboard to compare with.</div><p>Today\'s times didn\'t load, so we won\'t guess. Try again in a minute.</p>'); return; }
+  if (!todayTops.length){ setOut(out, '<div class="big">You\'d be #1.</div><p>Nobody has a time yet. Set one before the next drop.</p>', true); return; }
+  var ahead = todayTops.filter(function(t){ return t.time <= mine; }).length, place = ahead + 1, best = todayTops[0].time;
+  if (place === 1){
+    setOut(out, '<div class="big">That takes today\'s fees.</div><p>' + ((best - mine) / 1000).toFixed(3) + " faster than the current #1 (" + ft(best) + "). Hold it until the next drop and the day is yours.</p>", true);
+  } else if (place <= 10){
+    setOut(out, '<div class="big">You\'d be #' + place + ".</div><p>" + ((mine - best) / 1000).toFixed(3) + " behind #1 (" + ft(best) + "). Only #1 gets paid.</p>");
+  } else {
+    var tenth = todayTops[todayTops.length - 1].time;
+    setOut(out, '<div class="big">Outside the top 10.</div><p>#10 is ' + ft(tenth) + " and #1 is " + ft(best) + ". You're " + ((mine - best) / 1000).toFixed(3) + " off the lead.</p>");
+  }
+}
+$("#chkForm").addEventListener("submit", function(e){ e.preventDefault(); check(); });
+
+/* fee math */
+function num(id){ var v = parseFloat(String($(id).value).replace(",", ".")); return isFinite(v) ? v : NaN; }
+function sol(v){ return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function mathUpd(){
+  var vol = num("#mVol"), fee = num("#mFee"), days = num("#mDays");
+  var ok = vol >= 0 && fee >= 0 && fee <= 100 && days >= 0 && Math.floor(days) === days;
+  if (!ok){ ["#mOut","#mDay","#mYear","#mCut"].forEach(function(s){ $(s).textContent = "—"; }); return; }
+  var day = vol * fee / 100;
+  $("#mOut").textContent = sol(day * 0.99);
+  $("#mDay").textContent = sol(day) + " SOL";
+  $("#mYear").textContent = sol(day * 0.99 * days) + " SOL";
+  $("#mCut").textContent = sol(day * 0.01 * days) + " SOL";
+}
+["#mVol","#mFee","#mDays"].forEach(function(s){ $(s).addEventListener("input", mathUpd); });
+$("#mathForm").addEventListener("submit", function(e){ e.preventDefault(); });
+mathUpd();
+
+/* links */
+var fx = $("#fX"), fg = $("#fGh"), fb = $("#followBtn");
+if (CONFIG.x){ fx.href = CONFIG.x; fx.textContent = "X"; fx.classList.remove("off"); fx.removeAttribute("aria-disabled"); fx.target = "_blank"; fx.rel = "noopener"; fb.href = CONFIG.x; fb.textContent = "Follow on X"; fb.target = "_blank"; fb.rel = "noopener"; }
+else { fx.addEventListener("click", function(e){ e.preventDefault(); }); }
+if (CONFIG.github){ fg.href = CONFIG.github; } else { fg.remove(); }
+
+/* nav + reveal */
+var nav = $(".nav");
+function onScroll(){ nav.classList.toggle("sc", window.scrollY > 8); }
+window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+var rv = $$(".rv");
+var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduce || !("IntersectionObserver" in window)){ rv.forEach(function(el){ el.classList.add("vis"); }); }
+else {
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("vis"); io.unobserve(e.target); } }); }, { rootMargin: "0px 0px -8% 0px" });
+  rv.forEach(function(el){ io.observe(el); });
+  var sweep = function(){ $$(".rv").forEach(function(el){ if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("vis"); }); };
+  window.addEventListener("hashchange", function(){ setTimeout(sweep, 60); });
+  window.addEventListener("load", sweep); setTimeout(sweep, 400);
+  var st = 0; window.addEventListener("scroll", function(){ if (st) return; st = setTimeout(function(){ st = 0; sweep(); }, 120); }, { passive: true });
+}
+
+/* go */
+loadTracks(false);
+setInterval(tick, 1000);
+setInterval(function(){ if (!document.hidden) loadTops(); }, 60000);
+window.addEventListener("resize", tick);
+})();
+</script>
+</body>
+</html>
